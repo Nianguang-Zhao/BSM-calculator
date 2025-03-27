@@ -169,60 +169,65 @@
     </div>
 
     <script>
-        document.getElementById('optionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Clear previous error and results
-            document.getElementById('error-message').textContent = '';
-            
-            // Collect form data
-            const formData = new FormData(e.target);
-            
-            // Send AJAX request
-            fetch('/calculate', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    document.getElementById('error-message').textContent = data.error;
-                    return;
-                }
-                
-                // Update option price
-                document.getElementById('option_price').textContent = `$${data.result.price}`;
-                
-                // Update Greeks
-                document.getElementById('delta').textContent = data.result.delta;
-                document.getElementById('gamma').textContent = data.result.gamma;
-                document.getElementById('theta').textContent = data.result.theta;
-                document.getElementById('vega').textContent = data.result.vega;
-                document.getElementById('rho').textContent = data.result.rho;
-                
-                // Update Profit/Loss Analysis
-                document.getElementById('max_profit').textContent = 
-                    data.profit_loss.max_profit === 'Unlimited' ? 'Unlimited' : `$${data.profit_loss.max_profit}`;
-                document.getElementById('max_loss').textContent = 
-                    data.profit_loss.max_loss === 'Unlimited' ? 'Unlimited' : `$${data.profit_loss.max_loss}`;
-                document.getElementById('pop').textContent = 
-                    data.profit_loss.pop ? `${data.profit_loss.pop}%` : 'N/A';
-                
-                // Update charts
-                document.getElementById('pl_chart').src = 
-                    `data:image/png;base64,${data.pl_chart}`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('error-message').textContent = 
-                    'An unexpected error occurred. Please try again.';
+    document.getElementById('optionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Clear previous error and results
+    document.getElementById('error-message').textContent = '';
+    
+    // Collect form data
+    const formData = new FormData(e.target);
+    
+    // Use full URL for fetch
+    fetch('https://bsmcalculator.vercel.app/calculate', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Network response was not ok. Status: ${response.status}, Message: ${text}`);
             });
-        });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            document.getElementById('error-message').textContent = data.error;
+            console.error('Server error:', data.error);
+            return;
+        }
+        
+        // Update option price
+        document.getElementById('option_price').textContent = `$${data.result.price}`;
+        
+        // Update Greeks
+        document.getElementById('delta').textContent = data.result.delta;
+        document.getElementById('gamma').textContent = data.result.gamma;
+        document.getElementById('theta').textContent = data.result.theta;
+        document.getElementById('vega').textContent = data.result.vega;
+        document.getElementById('rho').textContent = data.result.rho;
+        
+        // Update Profit/Loss Analysis
+        document.getElementById('max_profit').textContent = 
+            data.profit_loss.max_profit === 'Unlimited' ? 'Unlimited' : `$${data.profit_loss.max_profit}`;
+        document.getElementById('max_loss').textContent = 
+            data.profit_loss.max_loss === 'Unlimited' ? 'Unlimited' : `$${data.profit_loss.max_loss}`;
+        document.getElementById('pop').textContent = 
+            data.profit_loss.pop ? `${data.profit_loss.pop}%` : 'N/A';
+        
+        // Update charts
+        document.getElementById('pl_chart').src = 
+            `data:image/png;base64,${data.pl_chart}`;
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        document.getElementById('error-message').textContent = 
+            `An error occurred: ${error.message}`;
+    });
+});
     </script>
 </body>
 </html>
