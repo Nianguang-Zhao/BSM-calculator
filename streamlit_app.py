@@ -9,7 +9,7 @@ import base64
 import traceback
 
 app = Flask(__name__)
-CORS(app)
+
 
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     """Calculate the Black-Scholes option price for both call and put options."""
