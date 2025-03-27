@@ -1,5 +1,5 @@
 flask
 flask-cors
-numpy==1.21.0
-scipy==1.7.0
-matplotlib==3.4.2
+numpy
+scipy
+matplotlib
