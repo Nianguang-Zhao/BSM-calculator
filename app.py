@@ -9,6 +9,7 @@ import base64
 import traceback
 
 app = Flask(__name__)
+CORS(app)
 
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     """Calculate the Black-Scholes option price for both call and put options."""
@@ -307,6 +308,7 @@ def calculate():
         return jsonify({"error": f"An error occurred: {str(e)}"}), 400
     finally:
         plt.close('all')  # Ensure plots are closed after each request
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5000)
+# if __name__ == "__main__":
+    # app.run(debug=True, host='0.0.0.0', port=5000)
