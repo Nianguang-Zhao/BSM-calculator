@@ -52,165 +52,147 @@ def create_profit_loss_chart(current_price, strike_price, option_price):
 st.markdown("""
 <style>
 .stApp {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
     background-color: #f4f4f4;
 }
 .main-container {
-    display: flex;
-    gap: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+.stColumn {
+    padding: 10px;
 }
 .input-section {
-    flex: 1;
-    background-color: white;
+    background-color: #f9f9f9;
+    border-radius: 8px;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
 }
-.results-section {
-    flex: 1;
-    background-color: white;
+.result-section {
+    background-color: #f0f4f8;
+    border-radius: 8px;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid #d1e0f0;
 }
 h1 {
     text-align: center;
     color: #2c3e50;
     margin-bottom: 30px;
-    font-weight: 600;
+    font-weight: bold;
 }
-.stSelectbox, .stNumberInput {
-    margin-bottom: 15px;
-}
-.pricing-metrics, .strategy-metrics {
+.result-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 15px;
 }
-.metric-box {
-    background-color: #f9f9f9;
+.result-item {
+    background-color: white;
+    border-radius: 6px;
     padding: 15px;
-    border-radius: 8px;
     text-align: center;
-    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.metric-label {
-    color: #555;
-    font-size: 0.9em;
+.result-item strong {
+    display: block;
+    color: #34495e;
     margin-bottom: 5px;
+    font-size: 0.9em;
 }
-.metric-value {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #2c3e50;
-}
-.stButton>button {
-    width: 100%;
-    background-color: #3498db;
-    color: white;
+.result-item .value {
+    font-size: 1.2em;
+    color: #2980b9;
     font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
 
 def main():
+    st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     st.markdown("<h1>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
     
-    # Main container with two columns
-    st.markdown("<div class='main-container'>", unsafe_allow_html=True)
+    # Create two columns
+    left_column, right_column = st.columns(2)
     
-    # Input Section
-    st.markdown("<div class='input-section'>", unsafe_allow_html=True)
-    st.markdown("<h2>Input Parameters</h2>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
+    with left_column:
+        st.markdown("<div class='input-section'>", unsafe_allow_html=True)
+        
         option_type = st.selectbox("Option Type", ["Call Option", "Put Option"])
         side = st.selectbox("Side", ["Buy", "Sell"])
-    
-    with col2:
+        
         current_stock_price = st.number_input("Current Stock Price (S)", value=44.0, step=0.1)
         strike_price = st.number_input("Strike Price (K)", value=33.0, step=0.1)
-    
-    col3, col4 = st.columns(2)
-    
-    with col3:
+        
         time_to_maturity = st.number_input("Time to Maturity (Days)", value=55)
         risk_free_rate = st.number_input("Risk-Free Rate (%)", value=4.0, step=0.1)
-    
-    with col4:
+        
         volatility = st.number_input("Volatility (%)", value=33.0, step=0.1)
-    
-    calculate_button = st.button("Calculate Option Strategy", help="Click to calculate option pricing metrics")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Results Section
-    st.markdown("<div class='results-section'>", unsafe_allow_html=True)
-    
-    if calculate_button:
-        # Convert inputs
-        T = time_to_maturity / 365  # Convert days to years
-        r = risk_free_rate / 100
-        sigma = volatility / 100
         
-        # Calculate option pricing
-        option_price, delta, gamma, theta, vega, rho = black_scholes_merton(
-            current_stock_price, strike_price, T, r, sigma, 
-            option_type='call' if option_type == "Call Option" else 'put'
-        )
-        
-        # Option Pricing Metrics
-        st.markdown("<h2>Pricing Metrics</h2>", unsafe_allow_html=True)
-        st.markdown("<div class='pricing-metrics'>", unsafe_allow_html=True)
-        pricing_metrics = [
-            ("Option Price", f"${option_price:.4f}"),
-            ("Delta", f"{delta:.4f}"),
-            ("Gamma", f"{gamma:.4f}"),
-            ("Theta", f"{theta:.4f}"),
-            ("Vega", f"{vega:.4f}"),
-            ("Rho", f"{rho:.4f}")
-        ]
-        
-        for label, value in pricing_metrics:
-            st.markdown(f"""
-            <div class='metric-box'>
-                <div class='metric-label'>{label}</div>
-                <div class='metric-value'>{value}</div>
-            </div>
-            """, unsafe_allow_html=True)
+        calculate_button = st.button("Calculate Option Strategy", help="Click to calculate option pricing metrics")
         
         st.markdown("</div>", unsafe_allow_html=True)
+    
+    with right_column:
+        st.markdown("<div class='result-section'>", unsafe_allow_html=True)
         
-        # Option Strategy Analysis
-        st.markdown("<h2>Strategy Analysis</h2>", unsafe_allow_html=True)
-        st.markdown("<div class='strategy-metrics'>", unsafe_allow_html=True)
-        strategy_analysis = [
-            ("Max Profit", "Unlimited"),
-            ("Max Loss", f"${option_price:.4f}")
-        ]
-        
-        for label, value in strategy_analysis:
-            st.markdown(f"""
-            <div class='metric-box'>
-                <div class='metric-label'>{label}</div>
-                <div class='metric-value'>{value}</div>
-            </div>
-            """, unsafe_allow_html=True)
+        if calculate_button:
+            # Convert inputs
+            T = time_to_maturity / 365  # Convert days to years
+            r = risk_free_rate / 100
+            sigma = volatility / 100
+            
+            # Calculate option pricing
+            option_price, delta, gamma, theta, vega, rho = black_scholes_merton(
+                current_stock_price, strike_price, T, r, sigma, 
+                option_type='call' if option_type == "Call Option" else 'put'
+            )
+            
+            # Option Pricing Results
+            st.markdown("<div class='result-grid'>", unsafe_allow_html=True)
+            pricing_metrics = [
+                ("Option Price", f"${option_price:.4f}"),
+                ("Delta", f"{delta:.4f}"),
+                ("Gamma", f"{gamma:.4f}"),
+                ("Theta", f"{theta:.4f}"),
+                ("Vega", f"{vega:.4f}"),
+                ("Rho", f"{rho:.4f}")
+            ]
+            
+            for label, value in pricing_metrics:
+                st.markdown(f"""
+                <div class='result-item'>
+                    <strong>{label}</strong>
+                    <div class='value'>{value}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Option Strategy Analysis
+            st.markdown("<div class='result-grid' style='margin-top: 15px;'>", unsafe_allow_html=True)
+            strategy_analysis = [
+                ("Max Profit", "Unlimited"),
+                ("Max Loss", f"${option_price:.4f}")
+            ]
+            
+            for label, value in strategy_analysis:
+                st.markdown(f"""
+                <div class='result-item'>
+                    <strong>{label}</strong>
+                    <div class='value'>{value}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Profit/Loss at Expiration Chart
+            fig = create_profit_loss_chart(current_stock_price, strike_price, option_price)
+            st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-        
-        # Profit/Loss at Expiration Chart
-        st.markdown("<h2>Profit/Loss Chart</h2>", unsafe_allow_html=True)
-        fig = create_profit_loss_chart(current_stock_price, strike_price, option_price)
-        st.plotly_chart(fig, use_container_width=True)
     
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Close main container
     st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
