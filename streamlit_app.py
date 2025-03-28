@@ -51,37 +51,47 @@ def create_profit_loss_chart(current_price, strike_price, option_price):
 # Custom CSS for styling
 st.markdown("""
 <style>
-.option-pricing-results {
+.stApp {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+}
+.pricing-results, .strategy-analysis {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
-.option-pricing-results > div {
+.result-box, .strategy-box {
     flex: 1;
     text-align: center;
-    padding: 10px;
-    background-color: #f1f1f1;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
     margin: 0 5px;
-    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.option-strategy-analysis {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+.result-box strong, .strategy-box strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.9em;
 }
-.option-strategy-analysis > div {
-    flex: 1;
+.result-value, .strategy-value {
+    font-size: 1.1em;
+    color: #333;
+    font-weight: bold;
+}
+h1 {
     text-align: center;
-    padding: 10px;
-    background-color: #f1f1f1;
-    margin: 0 5px;
-    border-radius: 4px;
+    color: #333;
+    margin-bottom: 30px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 def main():
-    st.markdown("<h1 style='text-align: center;'>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -115,8 +125,8 @@ def main():
         )
         
         # Option Pricing Results
-        st.markdown("<div class='option-pricing-results'>", unsafe_allow_html=True)
-        result_metrics = [
+        st.markdown("<div class='pricing-results'>", unsafe_allow_html=True)
+        pricing_metrics = [
             ("Option Price", f"${option_price:.4f}"),
             ("Delta", f"{delta:.4f}"),
             ("Gamma", f"{gamma:.4f}"),
@@ -125,18 +135,18 @@ def main():
             ("Rho", f"{rho:.4f}")
         ]
         
-        for label, value in result_metrics:
+        for label, value in pricing_metrics:
             st.markdown(f"""
-            <div>
-                <strong>{label}</strong><br>
-                {value}
+            <div class='result-box'>
+                <strong>{label}</strong>
+                <div class='result-value'>{value}</div>
             </div>
             """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
         
         # Option Strategy Analysis
-        st.markdown("<div class='option-strategy-analysis'>", unsafe_allow_html=True)
+        st.markdown("<div class='strategy-analysis'>", unsafe_allow_html=True)
         strategy_analysis = [
             ("Max Profit", "Unlimited"),
             ("Max Loss", f"${option_price:.4f}")
@@ -144,9 +154,9 @@ def main():
         
         for label, value in strategy_analysis:
             st.markdown(f"""
-            <div>
-                <strong>{label}</strong><br>
-                {value}
+            <div class='strategy-box'>
+                <strong>{label}</strong>
+                <div class='strategy-value'>{value}</div>
             </div>
             """, unsafe_allow_html=True)
         
