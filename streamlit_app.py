@@ -28,108 +28,128 @@ def create_profit_loss_chart(current_price, strike_price, option_price):
     pl_values = np.maximum(price_range - strike_price, 0) - option_price
     
     # Create Plotly figure
-    fig = plt.Figure(data=[plt.Scatter(x=price_range, y=pl_values, mode='lines', line=dict(color='blue', width=3))])
+    fig = plt.Figure(data=[plt.Scatter(x=price_range, y=pl_values, mode='lines', line=dict(color='blue'))])
     
     fig.update_layout(
-        title='Option Profit/Loss at Expiration',
+        title='Buy Call Option P/L at Expiration',
         xaxis_title='Stock Price at Expiration',
         yaxis_title='Profit/Loss (USD)',
         template='plotly_white',
-        height=400,
-        width=800,
-        font=dict(size=12),
-        title_font_size=16,
-        title_x=0.5
+        height=400
     )
     
     # Add vertical lines for current price and breakeven
-    fig.add_vline(x=current_price, line_dash='dash', line_color='green', 
-                  annotation_text='Current Price', annotation_position='top right')
+    fig.add_vline(x=current_price, line_dash='dash', line_color='green', annotation_text='Current Price: {:.2f}'.format(current_price))
     breakeven = strike_price + option_price
-    fig.add_vline(x=breakeven, line_dash='dash', line_color='red', 
-                  annotation_text='Breakeven', annotation_position='top right')
+    fig.add_vline(x=breakeven, line_dash='dash', line_color='red', annotation_text='Breakeven: {:.2f}'.format(breakeven))
     
     # Add horizontal line at y=0
     fig.add_hline(y=0, line_color='black', line_width=1)
     
     return fig
 
+# Custom CSS for styling
+st.markdown("""
+<style>
+.stApp {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.main-container {
+    display: flex;
+    gap: 20px;
+}
+.input-section {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.results-section {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+.stSelectbox, .stNumberInput {
+    margin-bottom: 15px;
+}
+.pricing-metrics, .strategy-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.metric-box {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+}
+.metric-label {
+    color: #555;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+.metric-value {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+.stButton>button {
+    width: 100%;
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
 def main():
-    # Page configuration
-    st.set_page_config(
-        page_title="Advanced Option Strategy Calculator", 
-        page_icon=":chart_with_upwards_trend:", 
-        layout="wide"
-    )
+    st.markdown("<h1>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
     
-    # Custom CSS
-    st.markdown("""
-    <style>
-    .main-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f9f9f9;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .stNumberInput > div > div > input {
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
-    }
-    .stSelectbox > div > div > div {
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
-    }
-    .metric-container {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-    .metric-box {
-        background-color: white;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        width: 18%;
-    }
-    .metric-label {
-        font-size: 0.8em;
-        color: #666;
-        margin-bottom: 5px;
-    }
-    .metric-value {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #333;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # Main container with two columns
+    st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    # Main title
-    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
+    # Input Section
+    st.markdown("<div class='input-section'>", unsafe_allow_html=True)
+    st.markdown("<h2>Input Parameters</h2>", unsafe_allow_html=True)
     
-    # Create two columns for inputs
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### Option Parameters")
         option_type = st.selectbox("Option Type", ["Call Option", "Put Option"])
         side = st.selectbox("Side", ["Buy", "Sell"])
-        current_stock_price = st.number_input("Current Stock Price (S)", value=44.0, step=0.1, format="%.2f")
-        strike_price = st.number_input("Strike Price (K)", value=33.0, step=0.1, format="%.2f")
     
     with col2:
-        st.markdown("### Market Conditions")
-        time_to_maturity = st.number_input("Time to Maturity (Days)", value=55)
-        risk_free_rate = st.number_input("Risk-Free Rate (%)", value=4.0, step=0.1, format="%.2f")
-        volatility = st.number_input("Volatility (%)", value=33.0, step=0.1, format="%.2f")
+        current_stock_price = st.number_input("Current Stock Price (S)", value=44.0, step=0.1)
+        strike_price = st.number_input("Strike Price (K)", value=33.0, step=0.1)
     
-    # Calculate button
-    calculate_button = st.button("Calculate Option Strategy", use_container_width=True)
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        time_to_maturity = st.number_input("Time to Maturity (Days)", value=55)
+        risk_free_rate = st.number_input("Risk-Free Rate (%)", value=4.0, step=0.1)
+    
+    with col4:
+        volatility = st.number_input("Volatility (%)", value=33.0, step=0.1)
+    
+    calculate_button = st.button("Calculate Option Strategy", help="Click to calculate option pricing metrics")
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Results Section
+    st.markdown("<div class='results-section'>", unsafe_allow_html=True)
     
     if calculate_button:
         # Convert inputs
@@ -143,9 +163,10 @@ def main():
             option_type='call' if option_type == "Call Option" else 'put'
         )
         
-        # Metrics display
-        st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
-        metrics = [
+        # Option Pricing Metrics
+        st.markdown("<h2>Pricing Metrics</h2>", unsafe_allow_html=True)
+        st.markdown("<div class='pricing-metrics'>", unsafe_allow_html=True)
+        pricing_metrics = [
             ("Option Price", f"${option_price:.4f}"),
             ("Delta", f"{delta:.4f}"),
             ("Gamma", f"{gamma:.4f}"),
@@ -154,7 +175,7 @@ def main():
             ("Rho", f"{rho:.4f}")
         ]
         
-        for label, value in metrics:
+        for label, value in pricing_metrics:
             st.markdown(f"""
             <div class='metric-box'>
                 <div class='metric-label'>{label}</div>
@@ -164,27 +185,33 @@ def main():
         
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Profit/Loss Chart
-        st.markdown("### Profit/Loss Analysis")
+        # Option Strategy Analysis
+        st.markdown("<h2>Strategy Analysis</h2>", unsafe_allow_html=True)
+        st.markdown("<div class='strategy-metrics'>", unsafe_allow_html=True)
+        strategy_analysis = [
+            ("Max Profit", "Unlimited"),
+            ("Max Loss", f"${option_price:.4f}")
+        ]
+        
+        for label, value in strategy_analysis:
+            st.markdown(f"""
+            <div class='metric-box'>
+                <div class='metric-label'>{label}</div>
+                <div class='metric-value'>{value}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Profit/Loss at Expiration Chart
+        st.markdown("<h2>Profit/Loss Chart</h2>", unsafe_allow_html=True)
         fig = create_profit_loss_chart(current_stock_price, strike_price, option_price)
         st.plotly_chart(fig, use_container_width=True)
-        
-        # Strategy Summary
-        st.markdown("### Strategy Summary")
-        col_summary1, col_summary2 = st.columns(2)
-        
-        with col_summary1:
-            st.metric("Max Profit", "Unlimited")
-        
-        with col_summary2:
-            st.metric("Max Loss", f"${option_price:.4f}")
-
-def __runpy__():
-    """
-    Special function to run the Streamlit app
-    This is optional and can be removed when running directly
-    """
-    main()
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Close main container
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
