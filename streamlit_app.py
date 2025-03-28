@@ -228,29 +228,56 @@ def generate_profit_loss_chart(S, K, option_price, option_type, side, premium_pa
 def main():
     st.set_page_config(layout="wide", page_title="Options Pricing Calculator")
     
+    # Custom CSS to reduce input width and adjust font sizes
+    st.markdown("""
+    <style>
+    /* Reduce width of number input containers */
+    .stNumberInput > div > div {
+        width: 150px !important;
+        min-width: 150px !important;
+    }
+    
+    /* Reduce font size for metrics */
+    .metric-container {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Adjust chart captions */
+    .caption {
+        font-size: 0.7rem !important;
+    }
+    
+    /* Reduce select box width */
+    .stSelectbox > div > div {
+        width: 150px !important;
+        min-width: 150px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Title
     st.title("Options Pricing and Strategy Analyzer")
     
     # Create two columns
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 2])  # Adjust column proportions
     
     with col1:
         st.header("Input Parameters")
         
         # Stock price input
-        S = st.number_input("Current Stock Price ($)", min_value=0.01, value=100.0, step=0.1)
+        S = st.number_input("Current Stock Price ($)", min_value=0.01, value=110.0, step=0.1, format="%.2f")
         
         # Strike price input
-        K = st.number_input("Strike Price ($)", min_value=0.01, value=100.0, step=0.1)
+        K = st.number_input("Strike Price ($)", min_value=0.01, value=100.0, step=0.1, format="%.2f")
         
         # Time to expiration input
         T = st.number_input("Time to Expiration (Days)", min_value=1, value=30, step=1)
         
         # Risk-free rate input
-        r = st.number_input("Risk-Free Rate (%)", min_value=0.0, value=2.0, step=0.1)
+        r = st.number_input("Risk-Free Rate (%)", min_value=0.0, value=4.0, step=0.1, format="%.2f")
         
         # Volatility input
-        sigma = st.number_input("Volatility (%)", min_value=0.1, value=20.0, step=0.1)
+        sigma = st.number_input("Volatility (%)", min_value=0.1, value=20.0, step=0.1, format="%.2f")
         
         # Option type selection
         option_type = st.selectbox("Option Type", ["Call", "Put"])
@@ -269,7 +296,7 @@ def main():
                 # Perform calculations
                 result = black_scholes(S, K, T, r/100, sigma/100, option_type.lower())
                 
-                # Create columns for Greeks
+                # Create columns for Greeks with reduced width
                 greek_cols = st.columns(6)
                 greek_names = ['Price', 'Delta', 'Gamma', 'Theta', 'Vega', 'Rho']
                 greek_values = [
@@ -281,9 +308,14 @@ def main():
                     result['rho']
                 ]
                 
-                # Display Greeks in one horizontal line
+                # Display Greeks with custom formatting
                 for col, name, value in zip(greek_cols, greek_names, greek_values):
-                    col.metric(name, f"{value}", help=None, label_visibility="visible")
+                    col.markdown(f"""
+                    <div style='text-align:center;'>
+                    <small style='color:gray;'>{name}</small><br>
+                    <span style='font-size:1rem;'>{value:.4f}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 # Calculate profit/loss
                 profit_loss = calculate_profit_loss(S, K, result['price'], option_type.lower(), side.lower(), result['price'])
@@ -291,8 +323,19 @@ def main():
                 # Display Max Profit and Max Loss
                 st.subheader("Strategy Analysis")
                 col1, col2 = st.columns(2)
-                col1.metric("Max Profit", str(profit_loss['max_profit']), help=None, label_visibility="visible")
-                col2.metric("Max Loss", str(profit_loss['max_loss']), help=None, label_visibility="visible")
+                col1.markdown("""
+                <div style='text-align:center;'>
+                <small style='color:gray;'>Max Profit</small><br>
+                <span style='font-size:1rem;'>{}</span>
+                </div>
+                """.format(str(profit_loss['max_profit'])), unsafe_allow_html=True)
+                
+                col2.markdown("""
+                <div style='text-align:center;'>
+                <small style='color:gray;'>Max Loss</small><br>
+                <span style='font-size:1rem;'>{}</span>
+                </div>
+                """.format(str(profit_loss['max_loss'])), unsafe_allow_html=True)
                 
                 # Generate and display charts
                 st.subheader("Visualizations")
@@ -300,14 +343,13 @@ def main():
                 
                 with col1:
                     st.image(f"data:image/png;base64,{generate_price_chart(S, K, T, r/100, sigma/100, option_type.lower())}")
-                    st.caption("Option Price Sensitivity")
+                    st.markdown("<div class='caption' style='text-align:center;'>Option Price Sensitivity</div>", unsafe_allow_html=True)
                 
                 with col2:
                     st.image(f"data:image/png;base64,{generate_profit_loss_chart(S, K, result['price'], option_type.lower(), side.lower(), result['price'])}")
-                    st.caption("Profit/Loss at Expiration")
+                    st.markdown("<div class='caption' style='text-align:center;'>Profit/Loss at Expiration</div>", unsafe_allow_html=True)
                 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    main()
