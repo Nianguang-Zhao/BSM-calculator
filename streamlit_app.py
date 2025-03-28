@@ -283,7 +283,7 @@ def main():
                 
                 # Display Greeks in one horizontal line
                 for col, name, value in zip(greek_cols, greek_names, greek_values):
-                    col.metric(name, f"{value}")
+                    col.metric(name, f"{value}", help=None, label_visibility="visible")
                 
                 # Calculate profit/loss
                 profit_loss = calculate_profit_loss(S, K, result['price'], option_type.lower(), side.lower(), result['price'])
@@ -291,8 +291,8 @@ def main():
                 # Display Max Profit and Max Loss
                 st.subheader("Strategy Analysis")
                 col1, col2 = st.columns(2)
-                col1.metric("Max Profit", str(profit_loss['max_profit']))
-                col2.metric("Max Loss", str(profit_loss['max_loss']))
+                col1.metric("Max Profit", str(profit_loss['max_profit']), help=None, label_visibility="visible")
+                col2.metric("Max Loss", str(profit_loss['max_loss']), help=None, label_visibility="visible")
                 
                 # Generate and display charts
                 st.subheader("Visualizations")
