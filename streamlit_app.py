@@ -28,91 +28,110 @@ def create_profit_loss_chart(current_price, strike_price, option_price):
     pl_values = np.maximum(price_range - strike_price, 0) - option_price
     
     # Create Plotly figure
-    fig = plt.Figure(data=[plt.Scatter(x=price_range, y=pl_values, mode='lines', line=dict(color='blue'))])
+    fig = plt.Figure(data=[plt.Scatter(x=price_range, y=pl_values, mode='lines', line=dict(color='blue', width=3))])
     
     fig.update_layout(
-        title='Buy Call Option P/L at Expiration',
+        title='Option Profit/Loss at Expiration',
         xaxis_title='Stock Price at Expiration',
         yaxis_title='Profit/Loss (USD)',
         template='plotly_white',
-        height=400
+        height=400,
+        width=800,
+        font=dict(size=12),
+        title_font_size=16,
+        title_x=0.5
     )
     
     # Add vertical lines for current price and breakeven
-    fig.add_vline(x=current_price, line_dash='dash', line_color='green', annotation_text='Current Price: {:.2f}'.format(current_price))
+    fig.add_vline(x=current_price, line_dash='dash', line_color='green', 
+                  annotation_text='Current Price', annotation_position='top right')
     breakeven = strike_price + option_price
-    fig.add_vline(x=breakeven, line_dash='dash', line_color='red', annotation_text='Breakeven: {:.2f}'.format(breakeven))
+    fig.add_vline(x=breakeven, line_dash='dash', line_color='red', 
+                  annotation_text='Breakeven', annotation_position='top right')
     
     # Add horizontal line at y=0
     fig.add_hline(y=0, line_color='black', line_width=1)
     
     return fig
 
-# Custom CSS for styling
-st.markdown("""
-<style>
-.stApp {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-}
-.pricing-results, .strategy-analysis {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-.result-box, .strategy-box {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    margin: 0 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.result-box strong, .strategy-box strong {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-size: 0.9em;
-}
-.result-value, .strategy-value {
-    font-size: 1.1em;
-    color: #333;
-    font-weight: bold;
-}
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-</style>
-""", unsafe_allow_html=True)
-
 def main():
-    st.markdown("<h1>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
+    # Page configuration
+    st.set_page_config(
+        page_title="Advanced Option Strategy Calculator", 
+        page_icon=":chart_with_upwards_trend:", 
+        layout="wide"
+    )
     
-    col1, col2 = st.columns(2)
+    # Custom CSS
+    st.markdown("""
+    <style>
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .stNumberInput > div > div > input {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+    }
+    .stSelectbox > div > div > div {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+    }
+    .metric-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    .metric-box {
+        background-color: white;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 18%;
+    }
+    .metric-label {
+        font-size: 0.8em;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    .metric-value {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Main title
+    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Advanced Option Strategy Calculator</h1>", unsafe_allow_html=True)
+    
+    # Create two columns for inputs
+    col1, col2 = st.columns([1, 1])
     
     with col1:
+        st.markdown("### Option Parameters")
         option_type = st.selectbox("Option Type", ["Call Option", "Put Option"])
         side = st.selectbox("Side", ["Buy", "Sell"])
+        current_stock_price = st.number_input("Current Stock Price (S)", value=44.0, step=0.1, format="%.2f")
+        strike_price = st.number_input("Strike Price (K)", value=33.0, step=0.1, format="%.2f")
     
     with col2:
-        current_stock_price = st.number_input("Current Stock Price (S)", value=44.0, step=0.1)
-        strike_price = st.number_input("Strike Price (K)", value=33.0, step=0.1)
-    
-    col3, col4 = st.columns(2)
-    
-    with col3:
+        st.markdown("### Market Conditions")
         time_to_maturity = st.number_input("Time to Maturity (Days)", value=55)
-        risk_free_rate = st.number_input("Risk-Free Rate (%)", value=4.0, step=0.1)
+        risk_free_rate = st.number_input("Risk-Free Rate (%)", value=4.0, step=0.1, format="%.2f")
+        volatility = st.number_input("Volatility (%)", value=33.0, step=0.1, format="%.2f")
     
-    with col4:
-        volatility = st.number_input("Volatility (%)", value=33.0, step=0.1)
+    # Calculate button
+    calculate_button = st.button("Calculate Option Strategy", use_container_width=True)
     
-    if st.button("Calculate Option Strategy", help="Click to calculate option pricing metrics"):
+    if calculate_button:
         # Convert inputs
         T = time_to_maturity / 365  # Convert days to years
         r = risk_free_rate / 100
@@ -124,9 +143,9 @@ def main():
             option_type='call' if option_type == "Call Option" else 'put'
         )
         
-        # Option Pricing Results
-        st.markdown("<div class='pricing-results'>", unsafe_allow_html=True)
-        pricing_metrics = [
+        # Metrics display
+        st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
+        metrics = [
             ("Option Price", f"${option_price:.4f}"),
             ("Delta", f"{delta:.4f}"),
             ("Gamma", f"{gamma:.4f}"),
@@ -135,36 +154,37 @@ def main():
             ("Rho", f"{rho:.4f}")
         ]
         
-        for label, value in pricing_metrics:
+        for label, value in metrics:
             st.markdown(f"""
-            <div class='result-box'>
-                <strong>{label}</strong>
-                <div class='result-value'>{value}</div>
+            <div class='metric-box'>
+                <div class='metric-label'>{label}</div>
+                <div class='metric-value'>{value}</div>
             </div>
             """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Option Strategy Analysis
-        st.markdown("<div class='strategy-analysis'>", unsafe_allow_html=True)
-        strategy_analysis = [
-            ("Max Profit", "Unlimited"),
-            ("Max Loss", f"${option_price:.4f}")
-        ]
-        
-        for label, value in strategy_analysis:
-            st.markdown(f"""
-            <div class='strategy-box'>
-                <strong>{label}</strong>
-                <div class='strategy-value'>{value}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # Profit/Loss at Expiration Chart
+        # Profit/Loss Chart
+        st.markdown("### Profit/Loss Analysis")
         fig = create_profit_loss_chart(current_stock_price, strike_price, option_price)
         st.plotly_chart(fig, use_container_width=True)
+        
+        # Strategy Summary
+        st.markdown("### Strategy Summary")
+        col_summary1, col_summary2 = st.columns(2)
+        
+        with col_summary1:
+            st.metric("Max Profit", "Unlimited")
+        
+        with col_summary2:
+            st.metric("Max Loss", f"${option_price:.4f}")
+
+def __runpy__():
+    """
+    Special function to run the Streamlit app
+    This is optional and can be removed when running directly
+    """
+    main()
 
 if __name__ == "__main__":
     main()
