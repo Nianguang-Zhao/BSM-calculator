@@ -1,5 +1,4 @@
-flask
-flask-cors
+streamlit
 numpy
 scipy
 matplotlib
