@@ -14,9 +14,9 @@ def black_scholes_merton(S, K, T, r, sigma, option_type='call'):
     
     delta = norm.cdf(d1)
     gamma = norm.pdf(d1) / (S * sigma * np.sqrt(T))
-    theta = -(S * sigma * norm.pdf(d1)) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2)
-    vega = S * np.sqrt(T) * norm.pdf(d1)
-    rho = K * T * np.exp(-r * T) * norm.cdf(d2)
+    theta = (-(S * sigma * norm.pdf(d1)) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2))/365
+    vega = S * norm.pdf(d1) * np.sqrt(T)/100
+    rho = K * T * np.exp(-r * T) * norm.cdf(d2)/100
     
     return option_price, delta, gamma, theta, vega, rho
 
