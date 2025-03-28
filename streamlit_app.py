@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+import streamlit as st
 import numpy as np
 from scipy.stats import norm
 import matplotlib
@@ -6,10 +6,6 @@ matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import io
 import base64
-import traceback
-
-app = Flask(__name__)
-
 
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     """Calculate the Black-Scholes option price for both call and put options."""
@@ -81,23 +77,11 @@ def calculate_profit_loss(S, K, option_price, option_type, side, premium_paid):
     return {
         'max_profit': max_profit,
         'max_loss': max_loss,
-        
     }
 
 def generate_price_chart(S, K, T, r, sigma, option_type):
     """
     Generate a comprehensive price chart for options.
-    
-    Args:
-        S (float): Current stock price
-        K (float): Strike price
-        T (float): Time to expiration
-        r (float): Risk-free rate
-        sigma (float): Volatility
-        option_type (str): 'call' or 'put'
-    
-    Returns:
-        str: Base64 encoded PNG image of the option price chart
     """
     # Generate a range of underlying prices
     ST_range = np.linspace(max(0.1, S * 0.5), S * 1.5, 100)
@@ -145,17 +129,6 @@ def generate_price_chart(S, K, T, r, sigma, option_type):
 def generate_profit_loss_chart(S, K, option_price, option_type, side, premium_paid):
     """
     Generate a comprehensive profit/loss chart for option strategies.
-    
-    Args:
-        S (float): Current stock price
-        K (float): Strike price
-        option_price (float): Option premium
-        option_type (str): 'call' or 'put'
-        side (str): 'buy' or 'sell'
-        premium_paid (float): Premium paid/received
-    
-    Returns:
-        str: Base64 encoded PNG image of the profit/loss chart
     """
     try:
         # Generate a range of underlying prices with more granularity
@@ -253,62 +226,92 @@ def generate_profit_loss_chart(S, K, option_price, option_type, side, premium_pa
         return image_base64
     
     except Exception as e:
-        print(f"Error in profit/loss chart generation: {e}")
+        st.error(f"Error in profit/loss chart generation: {e}")
         return None
 
-@app.route("/", methods=["GET"])
-def index():
-    return render_template("index.html")
+def main():
+    st.set_page_config(page_title="Option Strategy Calculator", page_icon="💹")
+    
+    st.title("Advanced Option Strategy Calculator")
+    
+    # Sidebar inputs
+    st.sidebar.header("Option Parameters")
+    option_type = st.sidebar.selectbox("Option Type", ["Call", "Put"])
+    side = st.sidebar.selectbox("Side", ["Buy", "Sell"])
+    
+    # Input fields
+    S = st.sidebar.number_input("Current Stock Price (S)", min_value=0.01, value=100.0, step=0.01)
+    K = st.sidebar.number_input("Strike Price (K)", min_value=0.01, value=100.0, step=0.01)
+    T = st.sidebar.number_input("Time to Maturity (Days)", min_value=1, value=30)
+    r = st.sidebar.number_input("Risk-Free Rate (%)", min_value=0.0, value=1.0, step=0.01)
+    sigma = st.sidebar.number_input("Volatility (%)", min_value=0.01, value=20.0, step=0.01)
+    
+    # Calculate button
+    if st.sidebar.button("Calculate Option Strategy"):
+        try:
+            # Convert percentages to decimals
+            r_decimal = r / 100
+            sigma_decimal = sigma / 100
+            
+            # Calculate option price and Greeks
+            result = black_scholes(S, K, T, r_decimal, sigma_decimal, option_type.lower())
+            
+            # Use the calculated option price as the premium
+            premium_paid = result['price']
+            
+            # Calculate profit and loss
+            profit_loss = calculate_profit_loss(S, K, result['price'], option_type.lower(), side.lower(), premium_paid)
+            
+            # Option Pricing Results
+            st.header("Option Pricing Results")
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("Option Price", f"${result['price']:.4f}")
+            with col2:
+                st.metric("Delta", f"{result['delta']:.4f}")
+            with col3:
+                st.metric("Gamma", f"{result['gamma']:.4f}")
+            
+            col4, col5, col6 = st.columns(3)
+            
+            with col4:
+                st.metric("Theta", f"{result['theta']:.4f}")
+            with col5:
+                st.metric("Vega", f"{result['vega']:.4f}")
+            with col6:
+                st.metric("Rho", f"{result['rho']:.4f}")
+            
+            # Profit/Loss Analysis
+            st.header("Option Strategy Analysis")
+            col7, col8 = st.columns(2)
+            
+            with col7:
+                st.metric("Max Profit", 
+                          f"${profit_loss['max_profit']}" if profit_loss['max_profit'] != 'Unlimited' 
+                          else 'Unlimited')
+            with col8:
+                st.metric("Max Loss", 
+                          f"${profit_loss['max_loss']}" if profit_loss['max_loss'] != 'Unlimited' 
+                          else 'Unlimited')
+            
+            # Generate and display charts
+            st.header("Option Strategy Visualizations")
+            
+            col9, col10 = st.columns(2)
+            
+            with col9:
+                st.subheader("Option Price Sensitivity")
+                chart = generate_price_chart(S, K, T, r_decimal, sigma_decimal, option_type.lower())
+                st.image(base64.b64decode(chart), use_column_width=True)
+            
+            with col10:
+                st.subheader("Profit/Loss at Expiration")
+                pl_chart = generate_profit_loss_chart(S, K, result['price'], option_type.lower(), side.lower(), premium_paid)
+                st.image(base64.b64decode(pl_chart), use_column_width=True)
+        
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
 
-@app.route("/calculate", methods=["POST"])
-def calculate():
-    try:
-        # Validate inputs
-        S = float(request.form["S"])
-        K = float(request.form["K"])
-        T = float(request.form["T"])
-        r = float(request.form["r"]) / 100  # Convert percentage to decimal
-        sigma = float(request.form["sigma"]) / 100  # Convert percentage to decimal
-        option_type = request.form.get("option_type", "call")
-        side = request.form.get("side", "buy")
-        
-        # Ensure matplotlib operations are thread-safe
-        plt.close('all')
-        
-        # Calculate option price and Greeks
-        result = black_scholes(S, K, T, r, sigma, option_type)
-        
-        # Use the calculated option price as the premium
-        premium_paid = result['price']
-        
-        # Calculate profit and loss
-        profit_loss = calculate_profit_loss(S, K, result['price'], option_type, side, premium_paid)
-        
-        # Generate price chart
-        chart = generate_price_chart(S, K, T, r, sigma, option_type)
-        
-        # Generate profit/loss chart
-        pl_chart = generate_profit_loss_chart(S, K, result['price'], option_type, side, premium_paid)
-        
-        # Custom JSON response to handle Infinity
-        response = {
-            "result": result,
-            "profit_loss": {
-                "max_profit": "Unlimited" if profit_loss['max_profit'] == float('inf') else profit_loss['max_profit'],
-                "max_loss": "Unlimited" if profit_loss['max_loss'] == float('inf') else profit_loss['max_loss'],
-                # "pop": profit_loss['pop']
-            },
-            "chart": chart,
-            "pl_chart": pl_chart
-        }
-        
-        return jsonify(response)
-    except Exception as e:
-        print(f"Detailed error: {traceback.format_exc()}")
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 400
-    finally:
-        plt.close('all')  # Ensure plots are closed after each request
-app.config['TEMPLATES_AUTO_RELOAD'] = True
-
-# if __name__ == "__main__":
-    # app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    main()
