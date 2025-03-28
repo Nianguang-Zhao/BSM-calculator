@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-import plotly.graph_objs as plt
+import plotly.graph_objs as go
 from scipy.stats import norm
 
 def black_scholes_merton(S, K, T, r, sigma, option_type='call'):
