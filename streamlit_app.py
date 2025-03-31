@@ -258,8 +258,6 @@ def main():
     # Title
     st.title("BSM Options Pricing and Strategy Analyzer")
 
-    # Add LinkedIn link button in the sidebar
-    st.sidebar.link_button("Connect with me on LinkedIn", "https://www.linkedin.com/in/nianguang-zhao/")
     
     # Create two columns
     col1, col2 = st.columns([1, 2])  # Adjust column proportions
@@ -356,6 +354,21 @@ def main():
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
+
+            # Add a spacer to ensure content doesn't get hidden behind the footer
+            st.write("")
+            st.write("")
+            st.write("")
+
+            # Add LinkedIn link at the bottom of the page
+            st.markdown("""
+            <div class="footer">
+                <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px" style="margin-right: 10px;">
+                    Connect with me on LinkedIn
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
