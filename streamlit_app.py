@@ -256,7 +256,7 @@ def main():
     """, unsafe_allow_html=True)
     
     # Title
-    st.title("Options Pricing and Strategy Analyzer")
+    st.title("BSM Options Pricing and Strategy Analyzer")
     
     # Create two columns
     col1, col2 = st.columns([1, 2])  # Adjust column proportions
