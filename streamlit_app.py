@@ -397,6 +397,8 @@ st.markdown("""
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
+    display: flex;
+    gap: 15px;
 }
 </style>
 
@@ -404,8 +406,12 @@ st.markdown("""
     <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
         <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px">
     </a>
+    <a href="https://github.com/Nianguang-Zhao" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="30px">
+    </a>
 </div>
-""", unsafe_allow_html=True)          
+""", unsafe_allow_html=True)
+        
 
 if __name__ == "__main__":
     main()
