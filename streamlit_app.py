@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 
+st.set_page_config(layout="wide", page_title="Options Pricing Calculator")
+
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     """Calculate the Black-Scholes option price for both call and put options."""
     T = T / 365  # Convert days to years
@@ -226,7 +228,7 @@ def generate_profit_loss_chart(S, K, option_price, option_type, side, premium_pa
         return None
 
 def main():
-    st.set_page_config(layout="wide", page_title="Options Pricing Calculator")
+    
     
     # Modified CSS to reduce width further and adjust spacing
     st.markdown("""
