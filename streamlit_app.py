@@ -316,7 +316,7 @@ def main():
         side = st.selectbox("Strategy Side", ["Buy", "Sell"])
         
         # Calculate button
-        calculate_button = st.button("Calculate Option Metrics")
+        calculate_button = st.button("Calculate")
     
     with col2:
         st.header("Option Analysis Results")
