@@ -389,14 +389,23 @@ st.write("")
 st.write("")
 st.write("")
 
-            # Add LinkedIn link at the bottom of the page
 st.markdown("""
+<style>
+.footer {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+</style>
+
 <div class="footer">
     <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px" style="margin-right: 10px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px">
     </a>
 </div>
-""", unsafe_allow_html=True)            
+""", unsafe_allow_html=True)          
 
 if __name__ == "__main__":
     main()
