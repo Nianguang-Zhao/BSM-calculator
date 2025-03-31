@@ -289,7 +289,7 @@ def main():
     st.title("BSM Options Pricing and Strategy Analyzer")
     
     # Create two columns with adjusted ratios to give more space to results
-    col1, col2 = st.columns([0.8, 2.2])  # Adjust column proportions
+    col1, col2 = st.columns([0.6, 2.4])  # Adjust column proportions
     
     with col1:
         st.header("Input Parameters")
