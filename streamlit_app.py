@@ -365,7 +365,7 @@ def main():
             <div class="footer">
                 <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
                     <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px" style="margin-right: 10px;">
-                    Connect with me on LinkedIn
+                    # Connect with me on LinkedIn
                 </a>
             </div>
             """, unsafe_allow_html=True)
