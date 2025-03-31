@@ -228,13 +228,39 @@ def generate_profit_loss_chart(S, K, option_price, option_type, side, premium_pa
 def main():
     st.set_page_config(layout="wide", page_title="Options Pricing Calculator")
     
-    # Custom CSS to reduce input width and adjust font sizes
+    # Modified CSS to reduce width further and adjust spacing
     st.markdown("""
     <style>
     /* Reduce width of number input containers */
     .stNumberInput > div > div {
-        width: 150px !important;
-        min-width: 150px !important;
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+    
+    /* Make number input container labels take less space */
+    .stNumberInput label {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Reduce select box width */
+    .stSelectbox > div > div {
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+    
+    /* Make select box labels take less space */
+    .stSelectbox label {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Reduce button width */
+    .stButton button {
+        width: 100% !important;
+    }
+    
+    /* Adjust column spacing */
+    [data-testid="column"] {
+        padding: 0rem 0.5rem !important;
     }
     
     /* Reduce font size for metrics */
@@ -247,20 +273,21 @@ def main():
         font-size: 0.7rem !important;
     }
     
-    /* Reduce select box width */
-    .stSelectbox > div > div {
-        width: 150px !important;
-        min-width: 150px !important;
+    /* Footer styling */
+    .footer {
+        margin-top: 20px;
+        padding: 10px;
+        text-align: center;
+        border-top: 1px solid #ddd;
     }
     </style>
     """, unsafe_allow_html=True)
     
     # Title
     st.title("BSM Options Pricing and Strategy Analyzer")
-
     
-    # Create two columns
-    col1, col2 = st.columns([1, 2])  # Adjust column proportions
+    # Create two columns with adjusted ratios to give more space to results
+    col1, col2 = st.columns([0.8, 2.2])  # Adjust column proportions
     
     with col1:
         st.header("Input Parameters")
@@ -355,19 +382,19 @@ def main():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
-            # Add a spacer to ensure content doesn't get hidden behind the footer
-            st.write("")
-            st.write("")
-            st.write("")
+# Add a spacer to ensure content doesn't get hidden behind the footer
+st.write("")
+st.write("")
+st.write("")
 
             # Add LinkedIn link at the bottom of the page
-            st.markdown("""
-            <div class="footer">
-                <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
-                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px" style="margin-right: 10px;">
-                </a>
-            </div>
-            """, unsafe_allow_html=True)
+st.markdown("""
+<div class="footer">
+    <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="30px" style="margin-right: 10px;">
+    </a>
+</div>
+""", unsafe_allow_html=True)            
 
 if __name__ == "__main__":
     main()
