@@ -349,14 +349,14 @@ def main():
                     st.image(f"data:image/png;base64,{generate_profit_loss_chart(S, K, result['price'], option_type.lower(), side.lower(), result['price'])}")
                     st.markdown("<div class='caption' style='text-align:center;'>Profit/Loss at Expiration</div>", unsafe_allow_html=True)
                 
-            st.sidebar.markdown("""
-<div style="text-align: center; margin-top: 20px;">
-    <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank" style="text-decoration: none; color: #0077b5; display: inline-flex; align-items: center;">
-        <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="16" height="16" style="margin-right: 5px;"> 
-        Nianguang Zhao
-    </a>
-</div>
-""", unsafe_allow_html=True)
+                st.sidebar.markdown("""
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="https://www.linkedin.com/in/nianguang-zhao/" target="_blank" style="text-decoration: none; color: #0077b5; display: inline-flex; align-items: center;">
+            <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="16" height="16" style="margin-right: 5px;"> 
+            Nianguang Zhao
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
