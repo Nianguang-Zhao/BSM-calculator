@@ -257,6 +257,9 @@ def main():
     
     # Title
     st.title("BSM Options Pricing and Strategy Analyzer")
+
+    # Add LinkedIn link button in the sidebar
+    st.sidebar.link_button("Connect with me on LinkedIn", "https://www.linkedin.com/in/nianguang-zhao/")
     
     # Create two columns
     col1, col2 = st.columns([1, 2])  # Adjust column proportions
@@ -349,8 +352,7 @@ def main():
                     st.image(f"data:image/png;base64,{generate_profit_loss_chart(S, K, result['price'], option_type.lower(), side.lower(), result['price'])}")
                     st.markdown("<div class='caption' style='text-align:center;'>Profit/Loss at Expiration</div>", unsafe_allow_html=True)
                 
-                    # Add LinkedIn link button in the sidebar
-                    st.sidebar.link_button("Connect with me on LinkedIn", "https://www.linkedin.com/in/nianguang-zhao/")
+                    
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
